@@ -15,32 +15,39 @@ const contas = require('./contas.json').contas;
 let contadorIds = contas.length;
 
 // Rota para obter todas as contas
-server.get('/contas', (req, res) => {
-  return res.json(contas);
+server.get('/contas/:userId', (req, res) => {
+  const userId = req.params.userId;
+  const contasUsuario = contas.filter(conta => conta.userId === userId);
+  return res.json(contasUsuario);
 });
 
+
 // Rota para adicionar uma nova conta
-server.post('/contas', (req, res) => {
+server.post('/contas/:userId', (req, res) => {
   const novaConta = req.body;
+  const userId = req.params.userId; // Obtem o ID do usuário da URL
 
   // Incrementar o contador e atribuir o ID único à nova conta
   novaConta.id = ++contadorIds;
+  novaConta.userId = userId;
 
   contas.push(novaConta);
   return res.status(201).json(novaConta);
 });
 
 // Rota para apagar uma conta pelo ID
-server.delete('/contas/:id', (req, res) => {
+// Rota para apagar uma conta pelo ID e ID do usuário
+server.delete('/contas/:userId/:id', (req, res) => {
+  const userId = req.params.userId; // Obtem o ID do usuário da URL
   const idConta = parseInt(req.params.id);
 
-  // Verificar se o id é um número válido
+  // Verificar se o idConta é um número válido
   if (isNaN(idConta)) {
     return res.status(400).json({ error: 'ID de conta inválido' });
   }
 
-  // Procurar a conta pelo ID
-  const indexConta = contas.findIndex(conta => conta.id === idConta);
+  // Procurar a conta pelo ID e ID do usuário
+  const indexConta = contas.findIndex(conta => conta.id === idConta && conta.userId === userId);
 
   // Verificar se a conta foi encontrada
   if (indexConta === -1) {
@@ -54,8 +61,9 @@ server.delete('/contas/:id', (req, res) => {
 });
 
 // Rota para atualizar uma conta pelo ID
-server.put('/contas/:id', (req, res) => {
-  const idConta = parseInt(req.params.id);
+server.put('/contas/:userId/:id', (req, res) => {
+  const userId = req.params.userId;
+  const idConta = parseInt(req.params.id); // Aqui você está obtendo o ID da URL
   const novaConta = req.body;
 
   // Verificar se o id é um número válido
@@ -76,6 +84,7 @@ server.put('/contas/:id', (req, res) => {
 
   return res.status(200).json(contas[indexConta]);
 });
+
 
 server.listen(5000, () => {
   console.log('Servidor está ligado! Acesse http://localhost:5000');

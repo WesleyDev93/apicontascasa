@@ -1,6 +1,12 @@
 {
   "contas": [
-    
-    
+    {
+      "id": 1,
+      "userId": "user1",   
+      "nome": "Aluguel",
+      "valor": 1000.0,
+      "status": "pendente"
+    }
+   
   ]
 }
